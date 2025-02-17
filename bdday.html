@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday POLY! 🎂</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js" defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Pacifico&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff69b4;
+            --secondary: #ff0066;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+
+        .hero-text {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            margin: 2rem 0;
+            line-height: 1.2;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin: 3rem 0;
+        }
+
+        .image-card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        .image-card img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            filter: brightness(0.9);
+            transition: filter 0.3s ease, transform 0.3s ease;
+        }
+
+        .message-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(8px);
+            padding: 2rem;
+            border-radius: 15px;
+            margin: 2rem 0;
+            font-size: 20pt;
+        }
+
+        .age-reveal {
+            font-size: clamp(3rem, 10vw, 5rem);
+            color: white;
+            font-weight: 900;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .signature {
+            font-family: 'Pacifico', cursive;
+            font-size: 2.5rem;
+            color: #fff;
+            margin-top: 2rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            background: linear-gradient(45deg, #760a0a, #031000);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: signature-glow 2s infinite alternate;
+        }
+
+        #musicPlayer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            padding: 15px;
+            cursor: pointer;
+            backdrop-filter: blur(5px);
+            transition: transform 0.3s ease;
+        }
+
+        #musicPlayer:hover {
+            transform: scale(1.1);
+        }
+
+        @keyframes signature-glow {
+            from { text-shadow: 0 0 10px rgba(0, 15, 2, 0.5); }
+            to { text-shadow: 0 0 20px rgba(255,107,107,0.8); }
+        }
+
+        @media (max-width: 768px) {
+            .image-grid { gap: 1rem; }
+            .signature { font-size: 2rem; }
+            #musicPlayer { bottom: 10px; right: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Replace the existing audio element with this -->
+<audio id="musicPlayer" loop autoplay>
+    <source src="/assets/audio/happy_birthday.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
+</audio>
+
+    <div class="container">
+        <h1 class="hero-text">Happy Birthday POLY! 🌟</h1>
+        
+        <div class="image-grid">
+            <div class="image-card">
+                <img src="/assets/images/poly1.jpg" alt="POLY" loading="lazy">
+            </div>
+            <div class="image-card">
+                <img src="/assets/images/poly2.jpg" alt="POLY" loading="lazy">
+            </div>
+            <div class="image-card">
+                <img src="/assets/images/poly3.jpg" alt="POLY" loading="lazy">
+            </div>
+            <div class="image-card">
+                <img src="/assets/images/poly4.jpg" alt="POLY" loading="lazy">
+            </div>
+        </div>
+
+        <div class="message-box">
+            <p class="message-text">Wishing you a day filled with love, laughter, and unforgettable moments! 🎂<br>
+            You make every day brighter just by being you! ✨</p>
+        </div>
+
+        <div class="age-reveal" id="ageCounter"></div>
+        
+        <div class="signature">
+            Yours,<br>
+            Soumya 
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Register ScrollTrigger plugin
+            gsap.registerPlugin(ScrollTrigger);
+    
+            // Music Player Code
+            const musicPlayer = document.getElementById('musicPlayer');
+            const playOverlay = document.getElementById('playOverlay');
+            
+            // Try autoplay first
+            const playPromise = musicPlayer.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    playOverlay.style.display = 'flex';
+                    document.body.addEventListener('click', () => {
+                        musicPlayer.play();
+                        playOverlay.style.display = 'none';
+                    }, { once: true });
+                });
+            }
+    
+            // Scroll-triggered Animations
+            // 1. Hero Text Animation
+            gsap.from(".hero-text", {
+                y: 50,
+                opacity: 0,
+                duration: 1,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: ".hero-text",
+                    start: "top center"
+                }
+            });
+    
+            // 2. Image Grid Animation
+            gsap.from(".image-card", {
+                y: 50,
+                opacity: 0,
+                stagger: 0.2,
+                duration: 0.8,
+                ease: "power3.out",
+                scrollTrigger: {
+                    trigger: ".image-grid",
+                    start: "top center"
+                },
+                onComplete: triggerConfetti
+            });
+    
+            // 3. Message Box Animation
+            gsap.from(".message-box", {
+                scale: 0.8,
+                opacity: 0,
+                duration: 1,
+                ease: "back.out(1.7)",
+                scrollTrigger: {
+                    trigger: ".message-box",
+                    start: "top center"
+                }
+            });
+    
+              // Modified Age Reveal Animation
+    gsap.fromTo("#ageCounter", 
+        { scale: 0.8, opacity: 0 },
+        { 
+            scale: 1,
+            opacity: 1,
+            duration: 1.2,
+            ease: "back.out(1.7)",
+            onUpdate: triggerConfetti,
+            scrollTrigger: {
+                trigger: "#ageCounter",
+                start: "top 80%",  // Changed from "top center"
+                end: "bottom center",
+                toggleActions: "play play none none"
+            }
+        }
+    );
+
+    // Enhanced age calculation with logging
+    function revealAge() {
+        const age = calculateAge();
+        const ageElement = document.getElementById('ageCounter');
+        console.log('Calculated age:', age); // Debug log
+        ageElement.textContent = `${age} Years of Amazingness! 🎉`;
+        console.log('Age element content:', ageElement.textContent); // Debug log
+    }
+    revealAge();
+    
+    gsap.from(".signature", {
+        y: 50,
+        opacity: 0,
+        duration: 1.5,
+        ease: "power4.out",
+        scrollTrigger: {
+            trigger: ".signature",
+            start: "top 90%",  // Changed trigger point
+            end: "bottom center",
+            toggleActions: "play none none none"
+        }
+    });
+            // Image Hover Effects (keep this as-is)
+            document.querySelectorAll('.image-card').forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    gsap.to(card, { duration: 0.2, y: -5, scale: 1.02 });
+                });
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, { duration: 0.2, y: 0, scale: 1 });
+                });
+            });
+    
+            // Age Calculation Function
+            function calculateAge() {
+                const birthDate = new Date(2002, 1, 19);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
+                return age;
+            }
+    
+            // Update Age Display
+            function revealAge() {
+                const age = calculateAge();
+                document.getElementById('ageCounter').textContent = 
+                    `${age} Years of Amazingness! 🎉`;
+            }
+            revealAge();
+    
+            // Confetti Function
+            function triggerConfetti() {
+                confetti({
+                    particleCount: 30,
+                    spread: 50,
+                    origin: { y: 0.6 },
+                    colors: ['#ff69b4', '#ff8e8e', '#ffffff']
+                });
+            }
+        });
+    </script>
+    <div id="playOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); color: white; justify-content: center; align-items: center; font-size: 2rem;">
+        Click anywhere to play music!
+    </div>
+</body>
+</html>
